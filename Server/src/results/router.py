@@ -14,7 +14,7 @@ fake_results = [
     {"id": 4, "nickname": "vova", "date": "2024-07-01", "score": 40},
     {"id": 5, "nickname": "vova", "date": "2024-07-01", "score": 200},
 ]
-
+#Endpoint для получения результатов
 @router.get("/", response_model=List[GameGetter])
 async def get_results(limit: int = 5, offset: int = 0):
     return fake_results

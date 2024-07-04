@@ -7,7 +7,7 @@ router = APIRouter(
     tags=["game"]
 )
 
-
+#Endpoint для добавления нового результата
 @router.post("/", response_model=int)
 async def append_new_result(game: GameSetter):
     pass

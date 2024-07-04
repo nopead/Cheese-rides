@@ -5,6 +5,7 @@ router = APIRouter(
     tags=["players"]
 )
 
+#Endpoint для получения игроков
 @router.get("/")
 async def get_players():
     pass
