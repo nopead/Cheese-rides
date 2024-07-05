@@ -1,14 +1,12 @@
 from pydantic import BaseModel
-from datetime import datetime
-
 
 class GameSetter(BaseModel):
-    player_id: int
+    player: str
     result: int
 
 
 class GameGetter(BaseModel):
     id: int
-    nickname: str
+    player: str
     date: str
-    score: int
+    result: int

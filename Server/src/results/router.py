@@ -1,20 +1,33 @@
 from fastapi import APIRouter
-from src.games.models import GameGetter
+from src.games.schemas import Game as game_schema
+from src.games.models import GameGetter as game_model
 from typing import List
+from sqlalchemy import create_engine, select
+from config import DSN
+from pydantic import TypeAdapter
 
 router = APIRouter(
     prefix="/results",
     tags=["results"]
 )
 
-fake_results = [
-    {"id": 1, "nickname": "vova", "date": "2024-07-01", "score": 120},
-    {"id": 2, "nickname": "vasya", "date": "2024-07-01", "score": 80},
-    {"id": 3, "nickname": "petya", "date": "2024-07-01", "score": 50},
-    {"id": 4, "nickname": "vova", "date": "2024-07-01", "score": 40},
-    {"id": 5, "nickname": "vova", "date": "2024-07-01", "score": 200},
-]
-#Endpoint для получения результатов
-@router.get("/", response_model=List[GameGetter])
+sync_engine = create_engine(
+    url=DSN,
+    echo=True
+)
+
+ta = TypeAdapter(List[game_model])
+
+@router.get("/", response_model=List[game_model])
 async def get_results(limit: int = 5, offset: int = 0):
-    return fake_results
+    with sync_engine.connect() as conn:
+        stmt = (
+            select(game_schema)
+            .order_by(game_schema.result.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = conn.execute(stmt).mappings().all()
+        models = ta.validate_python(result)
+        conn.commit()
+        return models
